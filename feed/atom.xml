@@ -43,8 +43,8 @@
         <div id="content">
             <h1 id="хельвеллин-2">Хельвеллин-2</h1>
 <p><em>Спасайся кто может:</em> <a href="https://photos.app.goo.gl/XE9jJ539e7dGcWaS7">ТОЛЬКО ФОТКИ</a> <em>в хорошем
-разрешении и без графоманского текста. Тут в блоге фотки ужаты:</em>
-<code>$ convert -resize 1000x750 -unsharp 0x0.5+1.0+0 -quality 100% $INPUT $OUTPUT</code></p>
+разрешении и без графоманского текста. Тут в блоге фотки ужаты:</em></p>
+<pre class><code>$ convert -resize 1000x750 -unsharp 0x0.5+1.0+0 -quality 100% $INPUT $OUTPUT</code></pre>
 <p>* * *</p>
 <p>Привет, братцы! Пишу из далёкого прошлого. У нас ещё июль, и мы опять намылились идти на Хельвеллин.</p>
 <p>Мы были там год назад.
@@ -5557,7 +5557,7 @@ Working in this company was like constant fun.</p>
 
         <div id="content">
             <h1 id="input-custom-examples">“--input custom” examples</h1>
-<p>This <a href="http://re2c.org/manual.html">RE2C</a> switch enables generic input API:</p>
+<p>This <a href="https://re2c.org">RE2C</a> switch enables generic input API:</p>
 <blockquote>
 <table>
 <tbody>
@@ -5765,7 +5765,7 @@ This primitive actually means “is there less than ‘n’ input characters lef
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="op">*</span>p<span class="op">;</span></span></code></pre></div>
 <p>?</p>
 <p>I came across this while thinking about <a href="../../posts/re2c/2015-01-13-input_model.html">RE2C input model</a>.
-<a href="http://re2c.org/manual.html">RE2C</a> generates complex expressions to manipulate input stream:</p>
+<a href="https://re2c.org">RE2C</a> generates complex expressions to manipulate input stream:</p>
 <blockquote>
 <table>
 <tbody>
@@ -6617,7 +6617,7 @@ and this <a href="http://llvm.org/bugs/show_bug.cgi?id=22123">CLANG bugreport</a
 
         <div id="content">
             <h1 id="re2c-input-model-call-for-opinions">re2c input model: call for opinions</h1>
-<p><a href="http://re2c.org/manual.html">RE2C</a> is a generator of lexical analyzers for C/C++.
+<p><a href="https://re2c.org">RE2C</a> is a generator of lexical analyzers for C/C++.
 It takes a description of regular expressions, transforms it to deterministic finite automaton (DFA)
 and compiles DFA to C/C++ code, which is further compiled to binary.
 The resulting program — LEXER — accepts a string of characters
