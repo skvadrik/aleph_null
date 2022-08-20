@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>/skvadrik/comparing assembly for similar C/C++ code</title>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/image_code.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/highlighting-kate.css" />
+
+        <link rel="alternate" type="application/atom+xml" href="../../feed/atom.xml" title="Atom 1.0" />
+        <link rel="alternate" type="application/rss+xml" href="../../feed/rss.xml" title="RSS 2.0" />
+        <link rel="shortcut icon" href="../../images/star.ico" />
+    </head>
+    <body>
+        <div id="header">
+            <a href="../../">★ aleph null ★</a>
+        </div>
+        <div id="navigation">
+            <a href="../../">home</a>
+            <a href="../../life.html">life</a>
+            <a href="../../re2c.html">re2c</a>
+            <a href="../../util.html">util</a>
+        </div>
+
+        <div id="content">
+            <h1 id="comparing-assembly-for-similar-cc-code">comparing assembly for similar C/C++ code</h1>
+<p>What is more efficient:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c++"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="op">*(</span>q <span class="op">=</span> <span class="op">++</span>p<span class="op">);</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c++"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">++</span>p<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> p<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> <span class="op">*</span>p<span class="op">;</span></span></code></pre></div>
+<p>?</p>
+<p>I came across this while thinking about <a href="../../posts/re2c/2015-01-13-input_model.html">RE2C input model</a>.
+<a href="http://re2c.org/manual.html">RE2C</a> generates complex expressions to manipulate input stream:</p>
+<blockquote>
+<table>
+<tbody>
+<tr class="odd">
+<td>yych = *++YYCURSOR;</td>
+</tr>
+<tr class="even">
+<td>yych = *(YYMARKER = YYCURSOR);</td>
+</tr>
+<tr class="odd">
+<td>yych = *(YYMARKER = ++YYCURSOR);</td>
+</tr>
+<tr class="even">
+<td>YYMARKER = ++YYCURSOR;</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>I wanted to reduce the number of basic operations on input, so I decided to simplify these expressions:</p>
+<blockquote>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 7%" />
+<col style="width: 55%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>yych = *++YYCURSOR;</td>
+<td>—&gt;</td>
+<td>++YYCURSOR; yych = *YYCURSOR;</td>
+</tr>
+<tr class="even">
+<td>yych = *(YYMARKER = YYCURSOR);</td>
+<td>—&gt;</td>
+<td>YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
+</tr>
+<tr class="odd">
+<td>yych = *(YYMARKER = ++YYCURSOR);</td>
+<td>—&gt;</td>
+<td>++YYCURSOR; YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
+</tr>
+<tr class="even">
+<td>YYMARKER = ++YYCURSOR;</td>
+<td>—&gt;</td>
+<td>++YYCURSOR; YYMARKER = YYCURSOR;</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>This transformation is perfectly valid from C/C++ standpoint.
+Yet it can affect performance: compilers may prefer one case to the other.
+Let’s go down to assembly and find out. :)</p>
+<p>I’ll keep to the following plan:</p>
+<ul>
+<li>take RE2C test collection</li>
+<li>pick those tests which reveal difference in RE2C-generated code</li>
+<li>compile both cases (using various compiler/optimizations/target configurations)</li>
+<li><a href="https://en.wikipedia.org/wiki/Objdump">objdump</a> object files</li>
+<li><a href="https://en.wikipedia.org/wiki/Diff_utility">diff</a> assembly</li>
+<li>investigate the difference (I will use small examples cut from real programs and <a href="http://meldmerge.org/">meld</a>).</li>
+</ul>
+<h2 id="gcc">gcc</h2>
+<p>gcc-4.9.2:</p>
+<blockquote>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 11%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different
+-O0</td>
+<td>different
+-O1</td>
+<td>different
+-O2</td>
+<td>different
+-O3</td>
+<td>different
+-Ofast</td>
+<td>different
+-Os</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>x86</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mingw64</td>
+<td>227</td>
+<td>139</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>mingw32</td>
+<td>227</td>
+<td>139</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>alpha</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>armv5tel</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>armv7a</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ia64</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mips64</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>powerpc64</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>powerpc</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>s390x</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>sparc64</td>
+<td>228</td>
+<td>140</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>gcc-4.8.3:</p>
+<blockquote>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 11%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different
+-O0</td>
+<td>different
+-O1</td>
+<td>different
+-O2</td>
+<td>different
+-O3</td>
+<td>different
+-Ofast</td>
+<td>different
+-Os</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>x86</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mingw64</td>
+<td>227</td>
+<td>139</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>mingw32</td>
+<td>227</td>
+<td>139</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>alpha</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>11</td>
+<td>11</td>
+<td>11</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>armv5tel</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>armv7a</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>ia64</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>11</td>
+<td>11</td>
+<td>11</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>mips64</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>powerpc64</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>powerpc</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>s390x</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>sparc64</td>
+<td>228</td>
+<td>140</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+<td>19</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>So what do we have here?</p>
+<h3 id="o0">-O0</h3>
+<hr />
+<p>On -O0 GCC-4.8.3 and GCC-4.9.2 are unanimous: many files differ, but in most cases instructions remain the same.
+What differs is the offset of YYCURSOR and YYMARKER on stack.
+Like in this simple example:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_source.png" alt="image" /></p>
+<p>x86_64: q’s address is -0x4(%rbp), while p’s is -0x8(%rbp)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_x86_64.png" alt="image" /></p>
+<p>alpha: q’s address is 20(fp), while p’s is 16(fp)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_alpha.png" alt="image" /></p>
+<p>armv7a: q’s address is [fp,#-8], while p’s is [fp,#-12]</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_armv7a.png" alt="image" /></p>
+<p>mips64: q’s address is 12(s8), while p’s is 8(s8)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_mips64.png" alt="image" /></p>
+<p>powerpc: q’s address is 28(r31), while p’s is 24(r31)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_powerpc.png" alt="image" /></p>
+<p>s390x: q’s address is 160(%r11), while p’s is 164(%r11)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_s390x.png" alt="image" /></p>
+<p>sparc64: q’s address is [%fp+0x7f7], while p’s is [%fp+0x7fb]</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_sparc64.png" alt="image" /></p>
+<p>ia64: q’s address is [r2+4], while p’s is [r2] (extra ‘adds r14=4,r2’ to compute r2+4)</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_stack_ia64.png" alt="image" /></p>
+<p>Real difference appears in cases where YYCURSOR and YYMARKER have different
+level of indirection (say, YYCURSOR is of type ‘char *’ and YMARKER is of type ‘char **’).
+It leads to one extra/missing load from memory. Like this:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_source.png" alt="image" /></p>
+<p>x86_64: *q requires one more ‘mov (%rax),%eax’ than p</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_x86_64.png" alt="image" /></p>
+<p>alpha: same with ‘ldl t0,0(t0)’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_alpha.png" alt="image" /></p>
+<p>armv7a: same with ‘ldr r3,[r3]’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_armv7a.png" alt="image" /></p>
+<p>mips64: same with ‘lw v0,0(v0)’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_mips64.png" alt="image" /></p>
+<p>powerpc: same with ‘lwz r9,0(r9)’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_powerpc.png" alt="image" /></p>
+<p>s390x: same with ‘l %r1,0(%r1)’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_s390x.png" alt="image" /></p>
+<p>sparc64: same with ‘ld [%g1],%g1’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_sparc64.png" alt="image" /></p>
+<p>ia64: same with ‘ld4 r14=[r14]’</p>
+<p><img src="images/input_model_assembly/asm_gcc_o0_load_ia64.png" alt="image" /></p>
+<p>Another group of differences is jump length (it may vary because of extra/missing instructions and varying length of instructions).</p>
+<p>And that’s all for -O0: the code is a trivial reflection of C/C++ source,
+so one can hardly judge it in terms of efficiency.</p>
+<h3 id="o1">-O1</h3>
+<hr />
+<p>Here things start to get interesting: no difference with GCC-4.9.2, but 19 different cases with GCC-4.8.3.
+Comparing the assembly doesn’t help much: looks like GCC-4.8.3 failed to deduplicate code in the second case:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_source.png" alt="image" /></p>
+<p>x86_64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_x86_64.png" alt="image" /></p>
+<p>alpha:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_alpha.png" alt="image" /></p>
+<p>armv7a:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_armv7a.png" alt="image" /></p>
+<p>mips64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_mips64.png" alt="image" /></p>
+<p>powerpc:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_powerpc.png" alt="image" /></p>
+<p>s390x:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_s390x.png" alt="image" /></p>
+<p>sparc64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_sparc64.png" alt="image" /></p>
+<p>ia64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_ia64.png" alt="image" /></p>
+<p>GCC-4.9.2 generates the same code in both cases (without duplicates).</p>
+<p>Why difference with GCC-4.8.3?
+It’s hard to tell from the assembly.
+We need to trace program transformations one by one.</p>
+<p>GCC holds the program through three intermediate representations: <a href="https://gcc.gnu.org/onlinedocs/gccint/GENERIC.html#GENERIC">GENERIC</a> —&gt; <a href="https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html#GIMPLE">GIMPLE</a> —&gt; <a href="https://gcc.gnu.org/onlinedocs/gccint/RTL.html#RTL">RTL</a>.
+Optimizations are mostly done in GIMPLE (target and language independent) and RTL (low-level).
+We can dump GIMPLE passes with “-fdump-tree-all” and RTL passes with “-fdump-rtl-all”.</p>
+<p>Since difference remains the same on all targets, it’s likely to emerge in one of GIMPLE passes.
+Both GCC-4.9.2 and GCC-4.8.3 generate the same dumps up to first forward propagation pass (.forwprop1):</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_gimple_ccp1.png" alt="image" /></p>
+<p>Howevwer, forward propagation with GCC-4.9.2 erases the difference:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_gimple_forwprop1_492.png" alt="image" /></p>
+<p>While with GCC-4.8.3 it’s getting worse:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_gimple_forwprop1_483.png" alt="image" /></p>
+<p>So that subsequent copy propagation pass (.copyprop1) fails on second file:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_gimple_copyprop1_483.png" alt="image" /></p>
+<p>Looks like a bug in forward propagation.
+All these 19 tests which reveal this bug are actually different variants of the same test:
+they all reduce use of YYMARKER from two times to one, so that YYMARKER becomes a single-use variable.
+This is kind of a rare case.</p>
+<p>I searched for commit that fixes forward propagation in GCC:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone git://gcc.gnu.org/git/gcc.git</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd git</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git log origin/gcc-4_8-branch..origin/gcc-4_9-branch tree-ssa-forwprop.c</span></code></pre></div>
+<p>And soon found <a href="https://gcc.gnu.org/git/gitweb.cgi?p=gcc.git;a=commitdiff;h=bfb89138de98b366acd107bbcc502febf7566991">this one</a>
+(verifying was easy after I learned to <a href="../../posts/util/2015-01-12-gcc_quick_build.html">quickly build GCC from source</a>).</p>
+<h3 id="o2-and-higher">-O2 and higher</h3>
+<hr />
+<p>With GCC-4.9.2 there’s almost no difference.
+There is only one different case, it differs only with -O2, only on some targets, and the difference is immaterial —
+swapped comparison operands and inverted jump condition:</p>
+<p>x86_64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_492_x86_64.png" alt="image" /></p>
+<p>alpha:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_492_alpha.png" alt="image" /></p>
+<p>powerpc64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_492_powerpc64.png" alt="image" /></p>
+<p>s390x:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_492_s390x.png" alt="image" /></p>
+<p>sparc64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_492_sparc64.png" alt="image" /></p>
+<p>With GCC-4.8.3 we see the same 19 cases: the difference creeps in with first forward propagation,
+outlives all GIMPLE optimizations and fades in RTL (sometimes completely).</p>
+<p>It’s hard to read RTL dumps, but with “-fdump-rtl-all-graph” GCC will generate a picture for each RTL pass.
+We can trace which RTL passes erase the difference in our example on, say, x86_64:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o1_source.png" alt="image" /></p>
+<p>Up to second control flow graph cleanup (.jump2) pass programs were that different:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_rtl_csa.png" alt="image" /></p>
+<p>Half of the difference erased by control flow graph cleanup:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_rtl_jump2.png" alt="image" /></p>
+<p>Difference completely gone after basic block reordering (.bbro) pass:</p>
+<p><img src="images/input_model_assembly/asm_gcc_o2_rtl_bbro.png" alt="image" /></p>
+<p>Nice pictures.</p>
+<h3 id="conclusion">conclusion</h3>
+<hr />
+<p>So what do we have after all?
+No performance regressions with GCC-4.9.2.
+Some very rare regressions due to a forward propagation bug in GCC-4.8.3, which almost vanish on -O2 and higher.</p>
+<h2 id="clang">clang</h2>
+<p>clang-3.6.0:</p>
+<blockquote>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 11%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different
+-O0</td>
+<td>different
+-O1</td>
+<td>different
+-O2</td>
+<td>different
+-O3</td>
+<td>different
+-Ofast</td>
+<td>different
+-Os</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>227</td>
+<td>224</td>
+<td>20</td>
+<td>18</td>
+<td>18</td>
+<td>18</td>
+<td>18</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td>armv7a</td>
+<td>220</td>
+<td>217</td>
+<td>15</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>powerpc64</td>
+<td>220</td>
+<td>217</td>
+<td>19</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<h3 id="o0-1">-O0</h3>
+<hr />
+<p>Unlike GCC, CLANG is sensitive to decomposition of complex expressions.
+In the example below, first program gets intermediate result from register,
+while second program always loads it from stack:</p>
+<p><img src="images/input_model_assembly/asm_clang_o0_source.png" alt="image" /></p>
+<p>x86_64: repeated ‘mov -0x4(%rbp),%rsi’ on the right vs %rdi on the left</p>
+<p><img src="images/input_model_assembly/asm_clang_o0_x86_64.png" alt="image" /></p>
+<p>armv7a: repeated ‘ldr r0,[sp,#4]’ on the right vs r1 on the left</p>
+<p><img src="images/input_model_assembly/asm_clang_o0_armv7a.png" alt="image" /></p>
+<p>powerpc64: repeated ‘ld r3,-16(r1)’ on the right vs r4 on the left</p>
+<p><img src="images/input_model_assembly/asm_clang_o0_powerpc64.png" alt="image" /></p>
+<p>This difference emerges in almost all tests,
+so CLANG with -O0 is a true performance regression (if only -O0 was about performance).</p>
+<h3 id="o1-1">-O1</h3>
+<hr />
+<p>With -O1 the difference disappears in most cases,
+but it is still evident in programs with an extra layer of indirection.
+We can induce it in our example:</p>
+<p><img src="images/input_model_assembly/asm_clang_o1_source.png" alt="image" /></p>
+<p>x86_64: repeated ‘mov (%rdi),%rax’ on the right</p>
+<p><img src="images/input_model_assembly/asm_clang_o1_x86_64.png" alt="image" /></p>
+<p>armv7a: repeated ‘ldr rX,[r0]’ on the right</p>
+<p><img src="images/input_model_assembly/asm_clang_o1_armv7a.png" alt="image" /></p>
+<p>powerpc64: repeated ‘ld rX,0(r3)’ on the right</p>
+<p><img src="images/input_model_assembly/asm_clang_o1_powerpc64.png" alt="image" /></p>
+<p>So CLANG with -O1 still is a performance regression in some cases.</p>
+<h3 id="o2-and-higher-1">-O2 and higher</h3>
+<hr />
+<p>Here difference finally fades.</p>
+<p>On x86_64, all different cases are trivial.
+Either length of some memory loads is changed:</p>
+<p><img src="images/input_model_assembly/asm_clang_o2_x86_64_load.png" alt="image" /></p>
+<p>which may cause changes in jump offsets, or instructions are swapped:</p>
+<p><img src="images/input_model_assembly/asm_clang_o2_x86_64_swapped.png" alt="image" /></p>
+<p>On armv7a we again see a few trivial differences with memory loads and swapped instructions.</p>
+<p>On powerpc64, however, a strange ‘clrlwi’ emerges in all 8 different cases:</p>
+<p><img src="images/input_model_assembly/asm_clang_o2_powerpc64_clrlwi.png" alt="image" /></p>
+<p>This seems completely pointless: ‘clrlwi r5,r5,24’ clears high-order 24 bits of r5,
+but they are already cleared by ‘lbz r5,1(r4)’.
+<a href="http://llvm.org/bugs/show_bug.cgi?id=22120">Bugreport</a>
+and <a href="http://reviews.llvm.org/rL225584">fix</a>.</p>
+<h3 id="conclusion-1">conclusion</h3>
+<hr />
+<p>Performance regressions with -O0 and -O1.
+No significant difference with -O2 and higher.</p>
+<h2 id="pcc">pcc</h2>
+<p>PCC is <a href="http://pcc.ludd.ltu.se/">Portable C compiler</a>.</p>
+<p>pcc-1.1.0:</p>
+<blockquote>
+<table style="width:66%;">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different
+-O0</td>
+<td>different
+-O1</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>39</td>
+<td>39</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>As most tests are written in C++, PCC could only compile 39 of them.</p>
+<h3 id="o0-2">-O0</h3>
+<hr />
+<p>Almost all different cases look the same. Like this:</p>
+<p><img src="images/input_model_assembly/asm_pcc_o0_source.png" alt="image" /></p>
+<p>Memory/register move and register/register addition vs memory/register addition —
+not much difference.</p>
+<p><img src="images/input_model_assembly/asm_pcc_o0_x86_64.png" alt="image" /></p>
+<h3 id="o0-3">-O0</h3>
+<hr />
+<p>Most of the cases are trivial (they use different general purpose registers).
+Some cases still differ in the same way as on -O0.</p>
+<h3 id="conclusion-2">conclusion</h3>
+<hr />
+<p>No performance regressions.</p>
+<h2 id="tcc">tcc</h2>
+<p>TCC is <a href="http://bellard.org/tcc/">Tiny C compiler</a>.</p>
+<p>tcc-0.9.26:</p>
+<blockquote>
+<table style="width:51%;">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+<col style="width: 15%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>40</td>
+<td>40</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>TCC is not an optimizing compiler.</p>
+<p>Like CLANG, TCC is sensitive to decomposition of complex expressions:</p>
+<p><img src="images/input_model_assembly/asm_tcc_source.png" alt="image" /></p>
+<p>First program stores intermediate result in %rax, while second loads it from stack:</p>
+<p><img src="images/input_model_assembly/asm_tcc_x86_64.png" alt="image" /></p>
+<p>Extra memory loads appear in all tests.</p>
+<h3 id="conclusion-3">conclusion</h3>
+<hr />
+<p>Performance regressions.</p>
+<h2 id="nwcc">nwcc</h2>
+<p>NWCC is <a href="http://nwcc.sourceforge.net/">Nils Weller’s C compiler</a>.</p>
+<p>nwcc-0.8.2:</p>
+<blockquote>
+<table style="width:51%;">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+<col style="width: 15%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>compiled</td>
+<td>different</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>x86_64</td>
+<td>39</td>
+<td>39</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>NWCC has no optimizations yet.</p>
+<p>Like CLANG and TCC, NWCC prefers complex expressions.
+All tests differ in the same way:</p>
+<p><img src="images/input_model_assembly/asm_nwcc_source.png" alt="image" /></p>
+<p>First program uses %r9 for intermediate result. Second program loads it from stack:</p>
+<p><img src="images/input_model_assembly/asm_nwcc_x86_64.png" alt="image" /></p>
+<h3 id="conclusion-4">conclusion</h3>
+<hr />
+<p>Performance regressions.</p>
+<h2 id="conclusion-5">conclusion</h2>
+<p><em>In general</em> with reasonable optimizatios there’s no difference on real-life programs.</p>
+<p><em>Honestly</em> some performance regressions are still possible even with good optimizations,
+see for example this <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64541">GCC bugreport</a>
+and this <a href="http://llvm.org/bugs/show_bug.cgi?id=22123">CLANG bugreport</a> (both stuck with the same problem: pointer aliasing).</p>
+
+<div class="info">
+    Posted on January 14, 2015
+    
+</div>
+
+<br />
+<br />
+<br />
+
+<!-- comments by Disquis -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'aleph-null'; // required: replace example with your forum shortname
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+        </div>
+        <div id="footer">
+            site proudly generated by <a href="http://jaspervdj.be/hakyll">hakyll</a>
+        </div>
+    </body>
+</html>
