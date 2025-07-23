@@ -125,8 +125,8 @@ and can be partially controlled by the programmer.</p>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> YYMARKER<span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span> YYCTXMARKER<span class="op">;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   char</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL(n) {}</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   </span><span class="dt">char</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL</span><span class="op">(</span><span class="pp">n</span><span class="op">)</span><span class="pp"> </span><span class="op">{}</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/*!re2c</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;int buffer &quot; / &quot;[&quot; [0-9]+ &quot;]&quot; { return true; }</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">        *                              { return false; }</span></span>
@@ -162,11 +162,11 @@ I did the latter:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sstream&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ptr_t</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>istringstream<span class="op"> *</span> <span class="va">is_</span><span class="op">;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>streampos<span class="op"> </span><span class="va">p_</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>istringstream <span class="op">*</span> <span class="va">is_</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>streampos <span class="va">p_</span><span class="op">;</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="op">(</span><span class="bu">std::</span>istringstream<span class="op"> *</span> is<span class="op">,</span> <span class="bu">std::</span>streampos<span class="op"> </span>p<span class="op">)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="op">(</span><span class="bu">std::</span>istringstream <span class="op">*</span> is<span class="op">,</span> <span class="bu">std::</span>streampos p<span class="op">)</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span> <span class="va">is_</span> <span class="op">(</span>is<span class="op">)</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">,</span> <span class="va">p_</span> <span class="op">(</span>p<span class="op">)</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">{}</span></span>
@@ -183,7 +183,7 @@ I did the latter:</p>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">*</span> <span class="kw">this</span><span class="op">;</span></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="kw">operator</span> <span class="op">+</span> <span class="op">(</span><span class="bu">std::</span>streamoff<span class="op"> </span>off<span class="op">)</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="kw">operator</span> <span class="op">+</span> <span class="op">(</span><span class="bu">std::</span>streamoff off<span class="op">)</span></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dt">ptr_t</span> <span class="op">(</span><span class="va">is_</span><span class="op">,</span> <span class="va">p_</span> <span class="op">+</span> off<span class="op">);</span></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
@@ -193,7 +193,7 @@ I did the latter:</p>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ptr1<span class="op">.</span><span class="va">p_</span> <span class="op">&lt;=</span> ptr2<span class="op">.</span><span class="va">p_</span><span class="op">;</span></span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">friend</span> <span class="bu">std::</span>streamoff<span class="op"> </span><span class="kw">operator</span> <span class="op">-</span> <span class="op">(</span><span class="at">const</span> <span class="dt">ptr_t</span> <span class="op">&amp;</span> ptr1<span class="op">,</span> <span class="at">const</span> <span class="dt">ptr_t</span> <span class="op">&amp;</span> ptr2<span class="op">)</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">friend</span> <span class="bu">std::</span>streamoff <span class="kw">operator</span> <span class="op">-</span> <span class="op">(</span><span class="at">const</span> <span class="dt">ptr_t</span> <span class="op">&amp;</span> ptr1<span class="op">,</span> <span class="at">const</span> <span class="dt">ptr_t</span> <span class="op">&amp;</span> ptr2<span class="op">)</span></span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ptr1<span class="op">.</span><span class="va">p_</span> <span class="op">-</span> ptr2<span class="op">.</span><span class="va">p_</span><span class="op">;</span></span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
@@ -203,8 +203,8 @@ I did the latter:</p>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    ptr_t YYMARKER    <span class="op">=</span> YYCURSOR<span class="op">;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    ptr_t YYCTXMARKER <span class="op">=</span> YYCURSOR<span class="op">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   char</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL(n) {}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   </span><span class="dt">char</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL</span><span class="op">(</span><span class="pp">n</span><span class="op">)</span><span class="pp"> </span><span class="op">{}</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/*!re2c</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;int buffer &quot; / &quot;[&quot; [0-9]+ &quot;]&quot; { return true; }</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">        *                              { return false; }</span></span>
@@ -308,9 +308,9 @@ In fact, RE2C only needs these basic operations:</p>
 </blockquote>
 <p>And all the cases above could be expressed via them:</p>
 <blockquote>
-<table style="width:100%;">
+<table style="width:99%;">
 <colgroup>
-<col style="width: 38%" />
+<col style="width: 37%" />
 <col style="width: 7%" />
 <col style="width: 54%" />
 </colgroup>
@@ -387,10 +387,10 @@ In fact, RE2C only needs these basic operations:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sstream&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="dt">ptr_t</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>istringstream<span class="op"> &amp;</span> <span class="va">is_</span><span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>istringstream <span class="op">&amp;</span> <span class="va">is_</span><span class="op">;</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">explicit</span> <span class="dt">ptr_t</span> <span class="op">(</span><span class="bu">std::</span>istringstream<span class="op"> &amp;</span> is<span class="op">)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">explicit</span> <span class="dt">ptr_t</span> <span class="op">(</span><span class="bu">std::</span>istringstream <span class="op">&amp;</span> is<span class="op">)</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span> <span class="va">is_</span> <span class="op">(</span>is<span class="op">)</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">{}</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
@@ -405,12 +405,12 @@ In fact, RE2C only needs these basic operations:</p>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">is_</span><span class="op">.</span>peek <span class="op">();</span></span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">operator</span> <span class="bu">std::</span>streampos<span class="op"> ()</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">operator</span> <span class="bu">std::</span>streampos <span class="op">()</span></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">is_</span><span class="op">.</span>tellg <span class="op">();</span></span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="op">&amp;</span> <span class="kw">operator</span> <span class="op">=</span> <span class="op">(</span><span class="bu">std::</span>streampos<span class="op"> </span>p<span class="op">)</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">ptr_t</span> <span class="op">&amp;</span> <span class="kw">operator</span> <span class="op">=</span> <span class="op">(</span><span class="bu">std::</span>streampos p<span class="op">)</span></span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">is_</span><span class="op">.</span>seekg <span class="op">(</span>p<span class="op">);</span></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">*</span><span class="kw">this</span><span class="op">;</span></span>
@@ -421,8 +421,8 @@ In fact, RE2C only needs these basic operations:</p>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    std<span class="op">::</span>streampos YYMARKER<span class="op">;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    std<span class="op">::</span>streampos YYCTXMARKER<span class="op">;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   char</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL(n) {}</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   </span><span class="dt">char</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL</span><span class="op">(</span><span class="pp">n</span><span class="op">)</span><span class="pp"> </span><span class="op">{}</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/*!re2c</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;int buffer &quot; / &quot;[&quot; [0-9]+ &quot;]&quot; { return true; }</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">        *                              { return false; }</span></span>
@@ -553,8 +553,8 @@ Usage examples <a href="../../posts/re2c/2015-01-15-input_model_custom.html">her
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    std<span class="op">::</span>streampos YYMARKER<span class="op">;</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    std<span class="op">::</span>streampos YYCTXMARKER<span class="op">;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   char</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL(n) {}</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYCTYPE   </span><span class="dt">char</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#   define YYFILL</span><span class="op">(</span><span class="pp">n</span><span class="op">)</span><span class="pp"> </span><span class="op">{}</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">/*!re2c</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;int buffer &quot; / &quot;[&quot; [0-9]+ &quot;]&quot; { return true; }</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">        *                              { return false; }</span></span>
