@@ -43,22 +43,22 @@ If the match is successful, LEXER performs some actions (predefined by the progr
 <col style="width: 52%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>YYCURSOR</td>
 <td>—&gt;</td>
 <td>current character</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYLIMIT</td>
 <td>—&gt;</td>
 <td>end of input</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYMARKER</td>
 <td>—&gt;</td>
 <td>backtrack position</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCTXMARKER</td>
 <td>—&gt;</td>
 <td>backtrack position for trailing context</td>
@@ -73,43 +73,43 @@ so that LEXER can use them in the following contexts:</p>
 <blockquote>
 <table>
 <tbody>
-<tr class="odd">
+<tr>
 <td>++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *(YYMARKER = YYCURSOR);</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *(YYMARKER = ++YCURSOR);</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYMARKER = YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYMARKER = ++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYMARKER;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYCTXMARKER = YYCURSOR + 1;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYCTXMARKER;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>if (YYLIMIT &lt;= YYCURSOR) ...</td>
 </tr>
-<tr class="even">
+<tr>
 <td>if ((YYLIMIT - YYCURSOR) &lt; n) ...</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYDEBUG (label, *YYCURSOR);</td>
 </tr>
 </tbody>
@@ -224,43 +224,43 @@ I did the latter:</p>
 <blockquote>
 <table>
 <tbody>
-<tr class="odd">
+<tr>
 <td>++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *(YYMARKER = YYCURSOR);</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *(YYMARKER = ++YCURSOR);</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYMARKER;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYCURSOR = YYCTXMARKER;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYMARKER = YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYMARKER = ++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCTXMARKER = YYCURSOR + 1;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>if (YYLIMIT &lt;= YYCURSOR) ...</td>
 </tr>
-<tr class="even">
+<tr>
 <td>if ((YYLIMIT - YYCURSOR) &lt; n) ...</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYDEBUG (label, *YYCURSOR);</td>
 </tr>
 </tbody>
@@ -275,31 +275,31 @@ In fact, RE2C only needs these basic operations:</p>
 <col style="width: 54%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>++YYCURSOR</td>
 <td>get current character</td>
 </tr>
-<tr class="even">
+<tr>
 <td>*YYCURSOR</td>
 <td>advance to the next character</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYMARKER = YYCURSOR</td>
 <td>backup input position</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCTXMARKER = YYCURSOR</td>
 <td>backup input position of trailing context</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYCURSOR = YYMARKER</td>
 <td>restore input position</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYCTXMARKER</td>
 <td>restore input position of trailing context</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>if ((YYLIMIT - YYCURSOR) &lt; n) ...</td>
 <td>ensure that enough characters are left</td>
 </tr>
@@ -315,67 +315,67 @@ In fact, RE2C only needs these basic operations:</p>
 <col style="width: 54%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>++YYCURSOR;</td>
 <td>—&gt;</td>
 <td>++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *YYCURSOR;</td>
 <td>—&gt;</td>
 <td>yych = *YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *++YYCURSOR;</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *(YYMARKER = YYCURSOR);</td>
 <td>—&gt;</td>
 <td>YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *(YYMARKER = ++YCURSOR);</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYMARKER = YYCURSOR;</td>
 <td>—&gt;</td>
 <td>YYMARKER = YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYMARKER = ++YYCURSOR;</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; YYMARKER = YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYMARKER;</td>
 <td>—&gt;</td>
 <td>YYCURSOR = YYMARKER;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYCTXMARKER = YYCURSOR + 1;</td>
 <td>—&gt;</td>
 <td>YYCTXMARKER = YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYCURSOR = YYCTXMARKER;</td>
 <td>—&gt;</td>
 <td>YYCURSOR = YYCTXMARKER; ++YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>if (YYLIMIT &lt;= YYCURSOR) ...</td>
 <td>—&gt;</td>
 <td>if ((YYLIMIT - YYCURSOR) &lt; 1) ...</td>
 </tr>
-<tr class="even">
+<tr>
 <td>if ((YYLIMIT - YYCURSOR) &lt; n) ...</td>
 <td>—&gt;</td>
 <td>if ((YYLIMIT - YYCURSOR) &lt; n) ...</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYDEBUG (label, *YYCURSOR);</td>
 <td>—&gt;</td>
 <td>YYDEBUG (label, *YYCURSOR);</td>
@@ -450,7 +450,7 @@ We can simply hide the new API behind a switch:</p>
 <blockquote>
 <table>
 <tbody>
-<tr class="odd">
+<tr>
 <td>--input &lt; default | custom | istream &gt;</td>
 </tr>
 </tbody>
@@ -466,31 +466,31 @@ We can simply hide the new API behind a switch:</p>
 <col style="width: 56%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>YYPEEK ()</td>
 <td>get current character</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYSKIP ()</td>
 <td>advance to the next character</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYBACKUP ()</td>
 <td>backup input position</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYBACKUPCTX ()</td>
 <td>backup input position of trailing context</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYRESTORE ()</td>
 <td>restore input position</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYRESTORECTX ()</td>
 <td>restore input position of trailing context</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYLESSTHAN (n)</td>
 <td>check if less than ‘n’ characters are left</td>
 </tr>
@@ -508,37 +508,37 @@ Usage examples <a href="../../posts/re2c/2015-01-15-input_model_custom.html">her
 <col style="width: 42%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>YYPEEK ()</td>
 <td>—&gt;</td>
 <td>YYCURSOR.peek ()</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYSKIP ()</td>
 <td>—&gt;</td>
 <td>YYCURSOR.ignore ()</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYBACKUP ()</td>
 <td>—&gt;</td>
 <td>YYMARKER = YYCURSOR.tellg ()</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYBACKUPCTX ()</td>
 <td>—&gt;</td>
 <td>YYCTXMARKER = YYCURSOR.tellg ()</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYRESTORE ()</td>
 <td>—&gt;</td>
 <td>YYCURSOR.seekg (YYMARKER)</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYRESTORECTX ()</td>
 <td>—&gt;</td>
 <td>YYCURSOR.seekg (YYCTXMARKER)</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>YYLESSTHAN (n)</td>
 <td>—&gt;</td>
 <td>YYLIMIT - YYCURSOR.tellg () &lt; n</td>

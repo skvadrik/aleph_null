@@ -38,16 +38,16 @@
 <blockquote>
 <table>
 <tbody>
-<tr class="odd">
+<tr>
 <td>yych = *++YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *(YYMARKER = YYCURSOR);</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *(YYMARKER = ++YYCURSOR);</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYMARKER = ++YYCURSOR;</td>
 </tr>
 </tbody>
@@ -62,22 +62,22 @@
 <col style="width: 55%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td>yych = *++YYCURSOR;</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>yych = *(YYMARKER = YYCURSOR);</td>
 <td>—&gt;</td>
 <td>YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>yych = *(YYMARKER = ++YYCURSOR);</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; YYMARKER = YYCURSOR; yych = *YYCURSOR;</td>
 </tr>
-<tr class="even">
+<tr>
 <td>YYMARKER = ++YYCURSOR;</td>
 <td>—&gt;</td>
 <td>++YYCURSOR; YYMARKER = YYCURSOR;</td>
@@ -113,7 +113,7 @@ Let’s go down to assembly and find out. :)</p>
 <col style="width: 11%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
@@ -130,7 +130,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>different
 -Os</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>228</td>
@@ -141,7 +141,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>x86</td>
 <td>228</td>
@@ -152,7 +152,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>mingw64</td>
 <td>227</td>
@@ -163,7 +163,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>mingw32</td>
 <td>227</td>
@@ -174,7 +174,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>alpha</td>
 <td>228</td>
@@ -185,7 +185,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>armv5tel</td>
 <td>228</td>
@@ -196,7 +196,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>armv7a</td>
 <td>228</td>
@@ -207,7 +207,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>ia64</td>
 <td>228</td>
@@ -218,7 +218,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>mips64</td>
 <td>228</td>
@@ -229,7 +229,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>powerpc64</td>
 <td>228</td>
@@ -240,7 +240,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>powerpc</td>
 <td>228</td>
@@ -251,7 +251,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>s390x</td>
 <td>228</td>
@@ -262,7 +262,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>0</td>
 <td>0</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>sparc64</td>
 <td>228</td>
@@ -291,7 +291,7 @@ Let’s go down to assembly and find out. :)</p>
 <col style="width: 11%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
@@ -308,7 +308,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>different
 -Os</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>228</td>
@@ -319,7 +319,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>x86</td>
 <td>228</td>
@@ -330,7 +330,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>mingw64</td>
 <td>227</td>
@@ -341,7 +341,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>mingw32</td>
 <td>227</td>
@@ -352,7 +352,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>alpha</td>
 <td>228</td>
@@ -363,7 +363,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>11</td>
 <td>9</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>armv5tel</td>
 <td>228</td>
@@ -374,7 +374,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>armv7a</td>
 <td>228</td>
@@ -385,7 +385,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>ia64</td>
 <td>228</td>
@@ -396,7 +396,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>11</td>
 <td>6</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>mips64</td>
 <td>228</td>
@@ -407,7 +407,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>powerpc64</td>
 <td>228</td>
@@ -418,7 +418,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>powerpc</td>
 <td>228</td>
@@ -429,7 +429,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>s390x</td>
 <td>228</td>
@@ -440,7 +440,7 @@ Let’s go down to assembly and find out. :)</p>
 <td>19</td>
 <td>19</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>sparc64</td>
 <td>228</td>
@@ -595,7 +595,7 @@ Some very rare regressions due to a forward propagation bug in GCC-4.8.3, which 
 <col style="width: 11%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
@@ -612,7 +612,7 @@ Some very rare regressions due to a forward propagation bug in GCC-4.8.3, which 
 <td>different
 -Os</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>227</td>
@@ -623,7 +623,7 @@ Some very rare regressions due to a forward propagation bug in GCC-4.8.3, which 
 <td>18</td>
 <td>18</td>
 </tr>
-<tr class="odd">
+<tr>
 <td></td>
 <td>armv7a</td>
 <td>220</td>
@@ -634,7 +634,7 @@ Some very rare regressions due to a forward propagation bug in GCC-4.8.3, which 
 <td>4</td>
 <td>4</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>powerpc64</td>
 <td>220</td>
@@ -707,7 +707,7 @@ No significant difference with -O2 and higher.</p>
 <col style="width: 15%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
@@ -716,7 +716,7 @@ No significant difference with -O2 and higher.</p>
 <td>different
 -O1</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>39</td>
@@ -753,13 +753,13 @@ Some cases still differ in the same way as on -O0.</p>
 <col style="width: 15%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
 <td>different</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>40</td>
@@ -789,13 +789,13 @@ Some cases still differ in the same way as on -O0.</p>
 <col style="width: 15%" />
 </colgroup>
 <tbody>
-<tr class="odd">
+<tr>
 <td></td>
 <td></td>
 <td>compiled</td>
 <td>different</td>
 </tr>
-<tr class="even">
+<tr>
 <td></td>
 <td>x86_64</td>
 <td>39</td>
